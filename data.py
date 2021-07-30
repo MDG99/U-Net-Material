@@ -2,7 +2,6 @@ import os
 import random
 import matplotlib.pyplot as plt
 import numpy as np
-import cv2
 from torch.utils import data
 from torchvision import *
 import transforms as tr
@@ -51,7 +50,10 @@ for n in names:
 
 #Transformaciones
 transforms = tr.SegmentationCompose([
-    tr.SegmentationRandomRotation((-90, 90))
+    #tr.SegmentationRandomRotation((-90, 90))
+    tr.SegmentationResize((500, 500)),
+    tr.SegmentationHorizontalFlip(0.5),
+    tr.SegmentationVerticalFlip(0.5)
 ])
 
 #Dataset y Dataloader
@@ -98,4 +100,4 @@ samplemask = samplemask.numpy()
 viewer = napari.Viewer()
 viewer.add_image(sampleimage, scale=(1, 1), name='Imagen')
 viewer.add_image(samplemask, scale=(1, 1), opacity=0.25, name='Material')
-napari.run()
+#napari.run()
