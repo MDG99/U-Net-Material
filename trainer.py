@@ -5,8 +5,8 @@ import torch
 
 class Trainer:
 
-    def __init(self, model, criterion, optimizer, tr_dataloader, val_dataloader=None,
-               lr_scheduler=None, epochs=100, epoch=0, device='cpu'):
+    def __init__(self, model, criterion, optimizer, tr_dataloader, val_dataloader=None,
+                 lr_scheduler=None, epochs=100, epoch=0, device='cpu'):
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
@@ -44,18 +44,17 @@ class Trainer:
 
         return self.training_loss, self.validation_loss, self.learning_rate
 
-
     def _train(self):
         self.model.train()
         train_losses = []
         batch_iter = tqdm(enumerate(self.training_DataLoader), 'Training', total=len(self.training_DataLoader),
-                          ñeave=False)
+                          leave=False)
 
         for i, (x, y) in batch_iter:
             input, target = x.to(self.device), y.to(self.device)
             self.optimizer.zero_grad()
             out = self.model(input)
-            loss = self.model(input)
+            loss = self.criterion(out, target)
             loss_value = loss.item()
             train_losses.append(loss_value)
             loss.backward()
@@ -88,5 +87,3 @@ class Trainer:
         self.validation_loss.append(np.mean(valid_losses))
 
         batch_iter.close()
-        
-

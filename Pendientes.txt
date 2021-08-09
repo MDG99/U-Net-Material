@@ -1,0 +1,2 @@
+1. El resultado del Summary no muestra el ModuleList, comprobar
+2. Aún hay un error en la línea 96 relacionado con conv1 del DownBlock

@@ -4,13 +4,14 @@ import torch
 
 @torch.jit.script
 def autocrop(encoder_layer, decoder_layer):
-    ds = encoder_layer.shape[2:]
-    es = decoder_layer.shape[2:]
-    assert ds[0] >= es[0]
-    assert ds[1] >= es[1]
-    if encoder_layer.dim() == 4:  # 2D
-        encoder_layer = encoder_layer[:, :, ((ds[0] - es[0]) // 2):((ds[0] + es[0]) // 2),
-                                            ((ds[1] - es[1]) // 2):((ds[1] + es[1]) // 2)]
+    if encoder_layer.shape[2:] != decoder_layer.shape[2:]:
+        ds = encoder_layer.shape[2:]
+        es = decoder_layer.shape[2:]
+        assert ds[0] >= es[0]
+        assert ds[1] >= es[1]
+        if encoder_layer.dim() == 4:  # 2D
+            encoder_layer = encoder_layer[:, :, ((ds[0] - es[0]) // 2):((ds[0] + es[0]) // 2),
+                                                ((ds[1] - es[1]) // 2):((ds[1] + es[1]) // 2)]
     return encoder_layer, decoder_layer
 
 
@@ -86,8 +87,8 @@ class DownBlock(nn.Module):
 
         #Normalización
         if self.normalization:
-            self.norm1 = get_normalization(self.normalization, output_channels)
-            self.norm2 = get_normalization(self.normalization, output_channels)
+            self.norm1 = get_normalization(self.normalization, self.output_ch)
+            self.norm2 = get_normalization(self.normalization, self.output_ch)
 
     def forward(self, x):
 
@@ -97,7 +98,7 @@ class DownBlock(nn.Module):
         if self.normalization:
             x = self.norm1(x)
 
-        # Convolución-Activación-Normalización 2
+        #Convolución-Activación-Normalización 2
         x = self.conv2(x)
         x = self.act2(x)
         if self.normalization:
@@ -176,7 +177,7 @@ class UpBlock(nn.Module):
         if self.normalization:
             x = self.norm1(x)
 
-        # Convolución-Activación-Normalización 2
+        #Convolución-Activación-Normalización 2
         x = self.conv2(x)
         x = self.act2(x)
         if self.normalization:
@@ -236,7 +237,7 @@ class UNet(nn.Module):
         self.down_blocks = nn.ModuleList(self.down_blocks)
         self.up_blocks = nn.ModuleList(self.up_blocks)
 
-        #self.initialize_parameters()
+        self.initialize_parameters()
 
     @staticmethod
     def weight_init(module, method, **kwargs):

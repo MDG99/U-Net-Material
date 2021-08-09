@@ -6,7 +6,54 @@ from torch.utils import data
 from torchvision import *
 import transforms as tr
 from PIL import Image
-import napari
+from sklearn.model_selection import train_test_split
+
+
+def get_dataloaders():
+    names = os.listdir('Data/input')
+
+    inputs = []
+    targets = []
+
+    for n in names:
+        inputs.append(os.path.join('Data/input/', n))
+        targets.append(os.path.join('Data/target/', n))
+
+    # Verificamos que cargaron bien las imágenes
+    # print(targets)
+
+    train_size = 0.80
+    random_seed = 40
+
+    # Dividimos los datos de entrenamiento y validación
+    train_inputs, val_inputs = train_test_split(inputs,
+                                                random_state=random_seed,
+                                                train_size=train_size,
+                                                shuffle=True)
+
+    train_targets, val_targets = train_test_split(targets,
+                                                  random_state=random_seed,
+                                                  train_size=train_size,
+                                                  shuffle=True)
+
+    print(np.shape(train_inputs))
+
+    # Transformaciones
+    transforms = tr.SegmentationCompose([
+        # tr.SegmentationRandomRotation((-90, 90))
+        tr.SegmentationResize((512, 512)),
+        tr.SegmentationHorizontalFlip(0.5),
+        tr.SegmentationVerticalFlip(0.5)
+    ])
+
+    # Dataset y Dataloader
+    training_dataset = CustomDataSet(inputs=train_inputs, targets=train_targets, transform=transforms)
+    validation_dataset = CustomDataSet(inputs=val_inputs, targets=val_targets, transform=transforms)
+
+    training_dataloader = data.DataLoader(dataset=training_dataset, batch_size=2, shuffle=True)
+    validation_dataloader = data.DataLoader(dataset=validation_dataset, batch_size=2, shuffle=True)
+
+    return training_dataloader, validation_dataloader
 
 
 class CustomDataSet(data.Dataset):
@@ -36,68 +83,47 @@ class CustomDataSet(data.Dataset):
         return i, t
 
 
-names = os.listdir('Data/input')
+def visualize():
+    import napari
+    # Cargando imágenes
+    training_dataloader, _ = get_dataloaders()
+    x, y = next(iter(training_dataloader))
 
-inputs = []
-targets = []
+    # Aseguramos que los tensores tengan la forma esperada
+    # print(f'x = shape{x.shape}; type: {x.dtype}')
+    # print(f'x = min: {x.min()}; max: {x.max()}')
+    # print(f'y = shape {y.shape}; class: {y.unique()}; type: {y.dtype}')
 
-for n in names:
-    inputs.append(os.path.join('Data/input/', n))
-    targets.append(os.path.join('Data/target', n))
+    ####################################################################################################################
+    # Mostrando imágenes
+    r = random.randint(0, len(x) - 1)
+    print(r)
 
-#Verificamos que cargaron bien las imágenes
-#print(targets)
+    ####################################################################################################################
+    # Procesamiento Matplotlib
+    # sampleimage = x[r].squeeze().permute(1,2,0)
+    # samplemask = y[r].squeeze().permute(1,2,0)
 
-#Transformaciones
-transforms = tr.SegmentationCompose([
-    #tr.SegmentationRandomRotation((-90, 90))
-    tr.SegmentationResize((500, 500)),
-    tr.SegmentationHorizontalFlip(0.5),
-    tr.SegmentationVerticalFlip(0.5)
-])
+    # plt.subplot(1, 2, 1)
+    # plt.imshow(x[r].squeeze().permute(1,2,0))
+    # plt.title('Input')
+    # plt.axis('off')
+    #
+    # plt.subplot(1, 2, 2)
+    # plt.imshow(y[r].squeeze().permute(1,2,0))
+    # plt.title('Target')
+    # plt.axis('off')
+    # plt.show()
+    #
 
-#Dataset y Dataloader
-training_dataset = CustomDataSet(inputs=inputs, targets=targets, transform=transforms)
-training_dataloader = data.DataLoader(dataset=training_dataset, batch_size=5, shuffle=True)
+    ####################################################################################################################
+    # Procesamiento Napari
+    sampleimage = x[r] / 255.0
+    sampleimage = sampleimage.numpy()
+    samplemask = y[r] / 255.0
+    samplemask = samplemask.numpy()
 
-# Cargando imágenes
-x, y = next(iter(training_dataloader))
-
-#Aseguramos que los tensores tengan la forma esperada
-#print(f'x = shape{x.shape}; type: {x.dtype}')
-#print(f'x = min: {x.min()}; max: {x.max()}')
-#print(f'y = shape {y.shape}; class: {y.unique()}; type: {y.dtype}')
-
-#######################################################################################################################
-# Mostrando imágenes
-r = random.randint(0, len(x) - 1)
-print(r)
-
-#######################################################################################################################
-# Procesamiento Matplotlib
-# sampleimage = x[r].squeeze().permute(1,2,0)
-# samplemask = y[r].squeeze().permute(1,2,0)
-
-# plt.subplot(1, 2, 1)
-# plt.imshow(x[r].squeeze().permute(1,2,0))
-# plt.title('Input')
-# plt.axis('off')
-#
-# plt.subplot(1, 2, 2)
-# plt.imshow(y[r].squeeze().permute(1,2,0))
-# plt.title('Target')
-# plt.axis('off')
-# plt.show()
-#
-
-#######################################################################################################################
-# Procesamiento Napari
-sampleimage = x[r] / 255.0
-sampleimage = sampleimage.numpy()
-samplemask = y[r] / 255.0
-samplemask = samplemask.numpy()
-
-viewer = napari.Viewer()
-viewer.add_image(sampleimage, scale=(1, 1), name='Imagen')
-viewer.add_image(samplemask, scale=(1, 1), opacity=0.25, name='Material')
-#napari.run()
+    viewer = napari.Viewer()
+    viewer.add_image(sampleimage, scale=(1, 1), name='Imagen')
+    viewer.add_image(samplemask, scale=(1, 1), opacity=0.25, name='Material')
+    # napari.run()
