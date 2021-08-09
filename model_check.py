@@ -40,7 +40,7 @@ depth = 8
 #out = compute_max_depth(shape, print_out=True, max_depth=10)
 
 #Enlista una serie de tamaños posibles dado un nivel de profundidad
-possible_shapes = compute_possible_shapes(low, high, depth)
+#possible_shapes = compute_possible_shapes(low, high, depth)
 
 
 model = UNet(in_channels=1,
