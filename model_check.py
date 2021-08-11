@@ -1,4 +1,4 @@
-from model import UNet
+from model2 import UNet
 from torchsummary import summary
 
 

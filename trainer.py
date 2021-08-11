@@ -54,7 +54,7 @@ class Trainer:
             input, target = x.to(self.device), y.to(self.device)
             self.optimizer.zero_grad()
             out = self.model(input)
-            loss = self.criterion(out, target)
+            loss = self.criterion(out, target.long())
             loss_value = loss.item()
             train_losses.append(loss_value)
             loss.backward()
@@ -70,7 +70,7 @@ class Trainer:
     def _validate(self):
         self.model.eval()
         valid_losses = []
-        batch_iter = tqdm(enumerate(self.validation_DataLoader), 'Validation', totla=len(self.validation_DataLoader),
+        batch_iter = tqdm(enumerate(self.validation_DataLoader), 'Validation', total=len(self.validation_DataLoader),
                           leave=False)
 
         for i, (x, y) in batch_iter:
@@ -78,7 +78,7 @@ class Trainer:
 
             with torch.no_grad():
                 out = self.model(input)
-                loss = self.criterion(out, target)
+                loss = self.criterion(out, target.long())
                 loss_value = loss.item()
                 valid_losses.append(loss_value)
 

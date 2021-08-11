@@ -1,11 +1,12 @@
 import os
 import random
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from torch.utils import data
 from torchvision import *
 import transforms as tr
-from PIL import Image
+from PIL import Image, ImageOps
 from sklearn.model_selection import train_test_split
 
 
@@ -36,8 +37,6 @@ def get_dataloaders():
                                                   train_size=train_size,
                                                   shuffle=True)
 
-    print(np.shape(train_inputs))
-
     # Transformaciones
     transforms = tr.SegmentationCompose([
         # tr.SegmentationRandomRotation((-90, 90))
@@ -49,6 +48,9 @@ def get_dataloaders():
     # Dataset y Dataloader
     training_dataset = CustomDataSet(inputs=train_inputs, targets=train_targets, transform=transforms)
     validation_dataset = CustomDataSet(inputs=val_inputs, targets=val_targets, transform=transforms)
+
+    #print(np.shape(training_dataset))
+    #print(np.shape(validation_dataset))
 
     training_dataloader = data.DataLoader(dataset=training_dataset, batch_size=2, shuffle=True)
     validation_dataloader = data.DataLoader(dataset=validation_dataset, batch_size=2, shuffle=True)
@@ -71,14 +73,31 @@ class CustomDataSet(data.Dataset):
     def __getitem__(self, index: int):
         my_input = self.inputs[index]
         my_target = self.target[index]
+        #i = cv2.imread(my_input, cv2.IMREAD_COLOR)
+        #t = cv2.imread(my_target, cv2.IMREAD_GRAYSCALE)
         i = Image.open(my_input)
         t = Image.open(my_target)
+        t = ImageOps.grayscale(t)
 
         # Aplicando las transformaciones
         if self.transform is not None:
             i, t = self.transform(i, t)
 
+        t_aux = t.load()
+
+        a, b = np.shape(t)
+        for r in range(a):
+            for c in range(b):
+                if t_aux[r, c] == 61:
+                    t_aux[r, c] = 0
+                else:
+                    t_aux[r, c] = 1
+
         i, t = np.float32(i), np.float32(t)
+        #i, t = np.uint8(i), np.uint8(t)
+
+        i = i.reshape((i.shape[2], i.shape[1], i.shape[0]))
+        t = t.reshape((t.shape[1], t.shape[0]))
 
         return i, t
 
