@@ -8,6 +8,7 @@ from torchvision import *
 import transforms as tr
 from PIL import Image, ImageOps
 from sklearn.model_selection import train_test_split
+import PIL
 
 
 def get_dataloaders():
@@ -39,8 +40,8 @@ def get_dataloaders():
 
     # Transformaciones
     transforms = tr.SegmentationCompose([
-        # tr.SegmentationRandomRotation((-90, 90))
-        tr.SegmentationResize((512, 512)),
+        tr.SegmentationRandomRotation((-90, 90)),
+        tr.SegmentationResize((256, 256)),
         tr.SegmentationHorizontalFlip(0.5),
         tr.SegmentationVerticalFlip(0.5)
     ])
@@ -52,8 +53,8 @@ def get_dataloaders():
     #print(np.shape(training_dataset))
     #print(np.shape(validation_dataset))
 
-    training_dataloader = data.DataLoader(dataset=training_dataset, batch_size=2, shuffle=True)
-    validation_dataloader = data.DataLoader(dataset=validation_dataset, batch_size=2, shuffle=True)
+    training_dataloader = data.DataLoader(dataset=training_dataset, batch_size=4, shuffle=True)
+    validation_dataloader = data.DataLoader(dataset=validation_dataset, batch_size=4, shuffle=True)
 
     return training_dataloader, validation_dataloader
 
@@ -73,8 +74,7 @@ class CustomDataSet(data.Dataset):
     def __getitem__(self, index: int):
         my_input = self.inputs[index]
         my_target = self.target[index]
-        #i = cv2.imread(my_input, cv2.IMREAD_COLOR)
-        #t = cv2.imread(my_target, cv2.IMREAD_GRAYSCALE)
+
         i = Image.open(my_input)
         t = Image.open(my_target)
         t = ImageOps.grayscale(t)
@@ -94,14 +94,34 @@ class CustomDataSet(data.Dataset):
                     t_aux[r, c] = 1
 
         i, t = np.float32(i), np.float32(t)
-        #i, t = np.uint8(i), np.uint8(t)
 
-        i = i.reshape((i.shape[2], i.shape[1], i.shape[0]))
+        i = i/255.0
+
+        i = np.moveaxis(i, -1, 0)
+        #i = i.reshape((i.shape[2], i.shape[1], i.shape[0]))
         t = t.reshape((t.shape[1], t.shape[0]))
 
         return i, t
 
+training_dataloader, _ = get_dataloaders()
+x, y = next(iter(training_dataloader))
+r = random.randint(0, len(x) - 1)
 
+# Procesamiento Matplotlib
+sampleimage = x[r].squeeze().permute(1,2,0)
+samplemask = y[r]
+
+plt.subplot(1, 2, 1)
+plt.imshow(sampleimage)
+plt.title('Input')
+plt.axis('off')
+#
+plt.subplot(1, 2, 2)
+plt.imshow(y[r], cmap='gray', vmin=0, vmax=1)
+plt.title('Target')
+plt.axis('off')
+plt.show()
+#
 def visualize():
     import napari
     # Cargando imágenes
