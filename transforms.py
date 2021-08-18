@@ -1,46 +1,12 @@
-
-import random
 import numbers
 import torch.nn
-import torchvision.transforms
-
 import numpy as np
 import torchvision.transforms.functional as F
-
 from collections.abc import Sequence
 from torchvision import *
 from torch import Tensor
 from torchvision.transforms.transforms import _setup_size
 from torchvision.transforms.functional import InterpolationMode, _interpolation_modes_from_int
-
-
-def custom_transform(input, mask):
-    input, mask = F.to_pil_image(input), F.to_pil_image(mask)
-
-    w, h = input.size
-
-    # Random horizontal flipping
-    if random.random() > 0.5:
-        input = F.hflip(input)
-        mask = F.hflip(mask)
-
-    # Random vertical flipping
-    if random.random() > 0.5:
-        input = F.vflip(input)
-        mask = F.vflip(mask)
-
-    if random.random() > 0.3:
-        parametros = torchvision.transforms.RandomAffine(180).get_params(degrees=[-90, 90], translate=[0, 0],
-                                                                         scale_ranges=[1, 1], shears=[0, 0],
-                                                                         img_size=[w, h])
-        input, mask = F.affine(input, *parametros), F.affine(mask, *parametros)
-
-    input = np.array(input)
-    mask = np.array(mask)
-
-    input, mask = F.to_tensor(input), F.to_tensor(mask)
-
-    return input, mask
 
 
 class SegmentationRandomCrop(torch.nn.Module):

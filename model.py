@@ -1,6 +1,5 @@
 from torch import nn
 import torch
-import numpy as np
 
 
 @torch.jit.script
@@ -165,7 +164,7 @@ class UpBlock(nn.Module):
         if self.up_mode != 'transposed':
             up_layer = self.conv0(up_layer)
 
-        up_layer = self.act0(up_layer)
+        up_layer = self.act0(up_layer) #Todo: revisar
 
         if self.normalization:
             up_layer = self.norm0(up_layer)
@@ -280,7 +279,3 @@ class UNet(nn.Module):
                       '_' not in attr_key[0] and 'training' not in attr_key}
         d = {self.__class__.__name__: attributes}
         return f'{d}'
-
-#Referencia
-#https://towardsdatascience.com/creating-and-training-a-u-net-model-with-pytorch-for-2d-3d-semantic-segmentation-model-building-6ab09d6a0862
-#https://github.com/sksq96/pytorch-summary
