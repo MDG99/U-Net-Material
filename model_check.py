@@ -1,4 +1,4 @@
-from model2 import UNet
+from model import UNet
 from torchsummary import summary
 
 
@@ -27,21 +27,20 @@ def compute_possible_shapes(low, high, depth):
         if len(shapes) == depth:
             possible_shapes[shape] = shapes
 
-    print(possible_shapes)
+    print(f"Possible shapes: {possible_shapes}")
     return possible_shapes
 
 
 shape = 1920
 low = 128
 high = 512
-depth = 8
+depth = 10
 
 # Describe las dimensiones de las imágenes en un modelo
-#out = compute_max_depth(shape, print_out=True, max_depth=10)
+out = compute_max_depth(shape, print_out=True, max_depth=depth)
 
 #Enlista una serie de tamaños posibles dado un nivel de profundidad
-#possible_shapes = compute_possible_shapes(low, high, depth)
-
+possible_shapes = compute_possible_shapes(low, high, depth)
 
 model = UNet(in_channels=1,
              out_channels=2,
