@@ -1,4 +1,3 @@
-# import napari
 import pathlib
 import torch
 import os
@@ -85,12 +84,6 @@ model.load_state_dict(model_weights)
 
 outputs = [prediccion(image, model, device) for image in images]
 idx = 0
-
-# Visualizamos con Napari
-# viewer = napari.Viewer()
-# img_nap = viewer.add_image(images[idx], name='Input')
-# tar_nap = viewer.add_labels(targets[idx], name='Target')
-# out_nap = viewer.add_labels(outputs[idx], name='Prediction')
 
 sampleimage = images[idx]
 samplemask = targets[idx]

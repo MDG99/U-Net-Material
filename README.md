@@ -2,10 +2,6 @@
  Este repositorio fue programado tomando como referencia el tutorial, a diferencia del programa original, aquí se 
  pretende trabajar con un dataset de imágenes de 2 dimensiones correspondientes a material antes y después de pruebas de adherencia. 
  
- ## Organización
- 
- ## Librerías
- 
  ## Dataset
  El dataset se encuentra en la carpeta [Data](Data), ahí mismo se encuentran tres subdirectorios: input y target para
  de donde se sacar las imágenes para el entrenameinto y validación; y test, el cuál contiene a su vez dos carpetas más 
@@ -55,21 +51,28 @@ la cual hace un resumen de lo que sucede en el modelo, así mismo hay dos funcio
 la manera en la que van cambiando las dimesiones de las imágenes a lo largo del modelo y otra función para conocer la 
 profundidad dado un tamaño de imagen de entrada.
 
- ## Entrenamiento
- El entrenamiento se empieza desde el [main.py](main.py), los pasos que sigue este archivo son: define el dispositivo, 
- obtiene los dataloaders, define el modelo, define el criterio (CrossEntropy) y el optimizador (SGD), realiza el 
- entrenamiento y guarda el modelo.
+## Entrenamiento
+El entrenamiento se empieza desde el [main.py](main.py), los pasos que sigue este archivo son: define el dispositivo, 
+obtiene los dataloaders, define el modelo, define el criterio (CrossEntropy) y el optimizador (SGD), realiza el 
+entrenamiento y guarda el modelo.
  
- Por otro lado, el archivo [trainer.py](trainer.py) contiene toda la lógica para realizar el entrenamiento, lo que retorna
- es un promedio del error de entrenamiento y validación después de cada época.
+Por otro lado, el archivo [trainer.py](trainer.py) contiene toda la lógica para realizar el entrenamiento, lo que retorna
+es un promedio del error de entrenamiento y validación después de cada época.
  
- ## Inferencia
+## Inferencia
+El documento [inferencia.py](inferencia.py) se encarga de probar el modelo ya entrenado en imágenes nunca antes vistas 
+(testing dataset), por lo que el programa empieza leyendo este dataset y dándole un preprocesameinto a las imágenes 
+(hace un redimensionamiento y el target lo pasa a blanco y negro), inicializa el modelo a usar, carga el archivo de los 
+ pesos *.pt* y a cada imagen del testing dataset lo mete a la función *predicción*, la cual realiza un preprocesameinto, 
+ evaluación del modelo y un postprocesamiento, otorgando a la salida el target predicho por el modelo.
+ Finalmente, se procede a calcular el *intersection over union* entre el target original y el predicho, así como mostrar 
+ los resultados usando matplotlib.  
+  
  
+## Modelos guardados
+Los archivos *.pt* resultantes del entrenamiento son generados en el fichero *main.py*  y pueden ser consultados [aquí](https://www.dropbox.com/sh/biej6gyhhk1id7t/AABVJjWshBgU4jGDcP6zc4oQa?dl=0)
  
- ## Modelos guardados
- Los archivos *.pt* resultantes del entrenamiento son generados en el fichero *main.py*  y pueden ser consultados [aquí](https://www.dropbox.com/sh/biej6gyhhk1id7t/AABVJjWshBgU4jGDcP6zc4oQa?dl=0)
- 
-  **Nota:** el nombre del archivo *.pt* es generado tomando la hora y fecha del sistema.
+**Nota:** el nombre del archivo *.pt* es generado tomando la hora y fecha del sistema.
 
   ## Tareas
   -[X] Modificar el archivo Readme y limpiar el código.
