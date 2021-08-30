@@ -36,7 +36,7 @@ tr = Trainer(model=model,
              tr_dataloader=dataloader_training,
              val_dataloader=dataloader_validation,
              lr_scheduler=None,
-             epochs=2,
+             epochs=50,
              epoch=0)
 
 # Start training

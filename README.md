@@ -77,7 +77,7 @@ Los archivos *.pt* resultantes del entrenamiento son generados en el fichero *ma
   ## Tareas
   -[X] Modificar el archivo Readme y limpiar el código.
   -[ ] Comparara contra un algortimo de binarización y binarización de Otsu.
-  -[ ] Revisar el preprocesamiento y posprocesamiento.
+  -[X] Revisar el preprocesamiento y posprocesamiento.
   -[ ] Comparar con otras variantes de U-Net.
   -[ ] Hacer que el *resize* sea dinámico.
   

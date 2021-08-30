@@ -35,7 +35,7 @@ def get_dataloaders():
     # Transformaciones
     transforms = tr.SegmentationCompose([
         tr.SegmentationRandomRotation((-90, 90)),
-        tr.SegmentationResize((256, 256)),
+        tr.SegmentationResize((512, 512)),
         tr.SegmentationHorizontalFlip(0.5),
         tr.SegmentationVerticalFlip(0.5)
     ])
@@ -65,7 +65,6 @@ def visualize():
     ####################################################################################################################
     # Procesamiento Matplotlib
     sampleimage = x[r].squeeze().permute(1, 2, 0)
-    samplemask = y[r]
 
     plt.subplot(1, 2, 1)
     plt.imshow(sampleimage)
@@ -130,8 +129,8 @@ class CustomDataSet(data.Dataset):
 
         i = i/255.0
 
-        i = np.moveaxis(i, -1, 0)
-        #i = i.reshape((i.shape[2], i.shape[1], i.shape[0]))
+        #i = np.moveaxis(i, -1, 0)
+        i = i.reshape((i.shape[2], i.shape[1], i.shape[0]))
         t = t.reshape((t.shape[1], t.shape[0]))
 
         return i, t

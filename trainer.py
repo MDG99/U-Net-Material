@@ -46,9 +46,8 @@ class Trainer:
     def _train(self):
         self.model.train()
         train_losses = []
-        batch_iter = enumerate(self.training_DataLoader)
 
-        for i, (x, y) in batch_iter:
+        for x, y in self.training_DataLoader:
             input, target = x.to(self.device), y.to(self.device)
             self.optimizer.zero_grad()
             out = self.model(input)
@@ -57,7 +56,6 @@ class Trainer:
             train_losses.append(loss_value)
             loss.backward()
             self.optimizer.step()
-
             print(f'Training: (loss: {loss_value:.4f})')
 
         self.training_loss.append(np.mean(train_losses))
@@ -66,9 +64,8 @@ class Trainer:
     def _validate(self):
         self.model.eval()
         valid_losses = []
-        batch_iter = enumerate(self.validation_DataLoader)
 
-        for i, (x, y) in batch_iter:
+        for x, y in self.validation_DataLoader:
             input, target = x.to(self.device), y.to(self.device)
 
             with torch.no_grad():
