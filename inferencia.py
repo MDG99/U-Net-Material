@@ -36,7 +36,7 @@ target_names = []
 
 for n in names:
     input_names.append(os.path.join('Data/test/input/', n))
-    target_names.append(os.path.join('Data/test/target/', n))
+    target_names.append(os.path.join('Data/test/targets/', n))
 
 # Leemos las imágenes
 images = [imread(img_name) for img_name in input_names]

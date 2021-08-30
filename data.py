@@ -16,7 +16,7 @@ def get_dataloaders():
 
     for n in names:
         inputs.append(os.path.join('Data/input/', n))
-        targets.append(os.path.join('Data/target/', n))
+        targets.append(os.path.join('Data/targets/', n))
 
     train_size = 0.80
     random_seed = 40
