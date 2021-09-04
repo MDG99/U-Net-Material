@@ -255,7 +255,8 @@ class SegmentationRandomRotation(torch.nn.Module):
                 fill = [float(f) for f in fill]
         angle = self.get_params(self.degrees[0], self.degrees[1])
 
-        mask_fill = [62, 39, 173]
+        #mask_fill = [62, 39, 173]
+        mask_fill = [0]
 
         return F.rotate(img, angle, self.resample, self.expand, self.center, fill),\
                F.rotate(mask, angle, self.resample, self.expand, self.center, mask_fill)
