@@ -34,6 +34,7 @@ def get_dataloaders():
 
     # Transformaciones
     transforms = tr.SegmentationCompose([
+        tr.SegmentationRandomCrop((500, 500)),
         tr.SegmentationResize((512, 512)),
         tr.SegmentationRandomRotation((-90, 90)),
         tr.SegmentationHorizontalFlip(0.5),

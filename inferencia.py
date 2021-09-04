@@ -1,4 +1,6 @@
 import pathlib
+
+import skimage.io
 import torch
 import os
 import numpy as np
@@ -44,7 +46,7 @@ def lectura_datos(path):
 
     # Leemos las imágenes
     images = [imread(img_name) for img_name in input_names]
-    images = [resize(img, (256, 256, 3)) for img in images]
+    #images = [resize(img, (256, 256, 3)) for img in images]
     targets = []
 
     for aux in range(len(target_names)):
@@ -61,23 +63,26 @@ def lectura_datos(path):
                 else:
                     t_aux[r, c] = 1
 
-        t2 = t2.resize((256, 256), Image.NEAREST)
+        #t2 = t2.resize((256, 256), Image.NEAREST)
+
+        #t3=np.array(t2, dtype=float)
+        #skimage.io.imsave("target.JPEG", t3)
         targets.append(t2)
 
-    return images, targets
+    return images, targets, input_names
 
 #######################################################################################################################
 # Lectura de imágenes
 #######################################################################################################################
 
 test_path = 'Data/test/'
-images, targets = lectura_datos(test_path)
+images, targets, names = lectura_datos(test_path)
 
 #######################################################################################################################
 # SVM
 #######################################################################################################################
 test_path = 'Data/'
-images_SVM, targets_SVM = lectura_datos(test_path)
+images_SVM, targets_SVM, _ = lectura_datos(test_path)
 grid = {'C': [0.1, 1, 10, 100], 'gamma': [0.0001, 0.001, 0.1, 1], 'kernel': ['rbf', 'poly']}
 svc = svm.SVC(probability=True)
 model = GridSearchCV(svc, grid)
@@ -103,8 +108,8 @@ model = UNet(in_channels=3,
              conv_mode='same').to(device)
 
 # Cargando el modelo
-model_name = 'material_model110820212055.pt'
-model_weights = torch.load(pathlib.Path.cwd() / model_name)
+model_name = 'material_model040920211954.pt'
+model_weights = torch.load(pathlib.Path.cwd() / model_name, map_location=torch.device('cpu'))
 model.load_state_dict(model_weights)
 
 outputs = [prediccion(image, model, device) for image in images]
@@ -112,7 +117,7 @@ outputs = [prediccion(image, model, device) for image in images]
 #######################################################################################################################
 # Seleccionamos una imagen cualquiera para visualizar
 #######################################################################################################################
-idx = 0
+idx = 5
 
 sampleimage = images[idx]
 samplemask = targets[idx]
@@ -146,7 +151,7 @@ print(f"Intersection over Union Otsu: {iou_otsu:4f}%")
 
 plt.subplot(1, 4, 1)
 plt.imshow(sampleimage)
-plt.title('Input')
+plt.title(f'{names[idx]}')
 plt.axis('off')
 
 plt.subplot(1, 4, 2)
